@@ -52,8 +52,16 @@
     const input = document.getElementById('msgInput');
     if (!input.value) return;
 
-    await _supabase.from('messages').insert([{ sender: name, content: input.value }]);
-    input.value = '';
+    const { error } = await _supabase
+        .from('messages')
+        .insert([{ sender: name, content: input.value }]);
+
+    if (error) {
+        alert("Message not sent ❌");
+        console.error(error);
+    } else {
+        input.value = '';
+    }
 }
 async function send() {
     const name = document.getElementById('userName').value || 'Guest';
