@@ -3,30 +3,104 @@
 <head>
   <title>My Chat App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
       background: #121212;
       color: white;
-      text-align: center;
-      padding-top: 50px;
     }
+
+    .screen {
+      display: none;
+      height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .active {
+      display: block;
+    }
+
     button {
-      padding: 12px 20px;
+      padding: 12px;
       font-size: 16px;
       border: none;
       border-radius: 8px;
       background: #1db954;
       color: black;
       cursor: pointer;
+      width: 100%;
+    }
+
+    input {
+      padding: 12px;
+      font-size: 16px;
+      width: 100%;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 10px;
+    }
+
+    .chat-box {
+      height: 70vh;
+      overflow-y: auto;
+      border: 1px solid #333;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .msg {
+      margin-bottom: 8px;
+      padding: 8px;
+      background: #2a2a2a;
+      border-radius: 6px;
     }
   </style>
 </head>
+
 <body>
 
-  <h1>💬 My Chat App</h1>
-  <p>A real chat app (website version)</p>
-  <button>Start Chatting</button>
+  <!-- HOME SCREEN -->
+  <div id="home" class="screen active">
+    <h1>💬 My Chat App</h1>
+    <p>Click below to start chatting</p>
+    <button onclick="startChat()">Start Chatting</button>
+  </div>
+
+  <!-- CHAT SCREEN -->
+  <div id="chat" class="screen">
+    <h2>Chat Room</h2>
+
+    <div class="chat-box" id="chatBox"></div>
+
+    <input id="messageInput" placeholder="Type a message..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script>
+    function startChat() {
+      document.getElementById("home").classList.remove("active");
+      document.getElementById("chat").classList.add("active");
+    }
+
+    function sendMessage() {
+      const input = document.getElementById("messageInput");
+      const text = input.value.trim();
+
+      if (text === "") return;
+
+      const msgDiv = document.createElement("div");
+      msgDiv.className = "msg";
+      msgDiv.innerText = text;
+
+      document.getElementById("chatBox").appendChild(msgDiv);
+      input.value = "";
+    }
+  </script>
 
 </body>
 </html>
+
+  
