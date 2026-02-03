@@ -4,40 +4,55 @@
     <title>My WhatsApp Clone</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body style="font-family: Arial; background: #e5ddd5; padding: 20px;">
+<body style="font-family: Arial; background: #e5ddd5; padding: 20px; display: flex; flex-direction: column; align-items: center;">
 
-    <h2>WhatsApp Clone</h2>
-    <div id="chat-box" style="height: 300px; background: white; border-radius: 10px; padding: 15px; overflow-y: scroll; border: 1px solid #ccc; margin-bottom: 10px;"></div>
-    
-    <input type="text" id="msgInput" placeholder="Type a message..." style="width: 70%; padding: 10px;">
-    <button onclick="send()" style="padding: 10px; background: #25d366; color: white; border: none; cursor: pointer; border-radius: 5px;">Send</button>
+    <div style="width: 100%; max-width: 400px; background: #075e54; color: white; padding: 10px; border-radius: 10px 10px 0 0; text-align: center;">
+        <strong>WhatsApp Clone</strong>
+    </div>
+
+    <div id="chat-box" style="width: 100%; max-width: 400px; height: 400px; background: white; padding: 15px; overflow-y: scroll; border: 1px solid #ccc;">
+        </div>
+
+    <div style="width: 100%; max-width: 400px; background: #f0f0f0; padding: 10px; border-radius: 0 0 10px 10px; display: flex; flex-direction: column; gap: 5px;">
+        <input type="text" id="userName" placeholder="Your Name (e.g. Rahul)" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+        <div style="display: flex; gap: 5px;">
+            <input type="text" id="msgInput" placeholder="Type a message..." style="flex: 1; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
+            <button onclick="send()" style="padding: 8px 15px; background: #25d366; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Send</button>
+        </div>
+    </div>
 
     <script>
-        // These are your unique keys from your Supabase dashboard
-        const URL = 'https://dgrdilmeeeejsjxwyzcf.supabase.co'; 
+        // Your unique database connection
+        const URL = 'https://dgrdilmeeeejsjxwyzcf.supabase.co';
         const KEY = 'sb_publishable_yvI1lQEmFmcOAc8QuEQlLA_TpM306Zv';
         const _supabase = supabase.createClient(URL, KEY);
 
-        // This makes messages appear instantly (Realtime)
+        // Listen for new messages from anyone
         _supabase.channel('messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
             const chat = document.getElementById('chat-box');
-            chat.innerHTML += `<p><strong>${payload.new.sender}:</strong> ${payload.new.content}</p>`;
+            const isMe = payload.new.sender === document.getElementById('userName').value;
+            
+            chat.innerHTML += `
+                <div style="margin-bottom: 10px; text-align: ${isMe ? 'right' : 'left'}">
+                    <div style="display: inline-block; padding: 8px 12px; border-radius: 10px; background: ${isMe ? '#dcf8c6' : '#fff'}; border: 1px solid #ddd;">
+                        <small style="color: #075e54; font-weight: bold;">${payload.new.sender}</small><br>
+                        ${payload.new.content}
+                    </div>
+                </div>`;
             chat.scrollTop = chat.scrollHeight;
         }).subscribe();
 
-        // This sends your message to the Supabase table
+        // Function to send a message
         async function send() {
+            const name = document.getElementById('userName').value || 'Guest';
             const input = document.getElementById('msgInput');
             if (input.value === "") return;
-            
+
             await _supabase.from('messages').insert([
-                { content: input.value, sender: 'Me' }
+                { content: input.value, sender: name }
             ]);
             input.value = '';
         }
     </script>
 </body>
 </html>
-<input type="text" id="userName" placeholder="Your Name" style="width: 25%; padding: 10px; margin-bottom: 5px;">
-<br>
-<input type="text" id="msgInput" placeholder="Type a message..." style="width: 70%; padding: 10px;">
