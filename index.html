@@ -47,14 +47,22 @@
                 fetchMessages();
             }).subscribe();
 
-        async function send() {
-            const name = document.getElementById('userName').value || 'Guest';
-            const input = document.getElementById('msgInput');
-            if (!input.value) return;
+       async function send() {
+    const name = document.getElementById('userName').value || 'Guest';
+    const input = document.getElementById('msgInput');
+    if (!input.value) return;
 
-            await _supabase.from('messages').insert([{ sender: name, content: input.value }]);
-            input.value = '';
-        }
+    await _supabase.from('messages').insert([{ sender: name, content: input.value }]);
+    input.value = '';
+}
+async function send() {
+    const name = document.getElementById('userName').value || 'Guest';
+    const input = document.getElementById('msgInput');
+    if (!input.value) return;
+
+    await _supabase.from('messages').insert([{ sender: name, content: input.value }]);
+    input.value = '';
+}
 
         // THIS IS THE PART THAT WAS MISSING:
         fetchMessages();
