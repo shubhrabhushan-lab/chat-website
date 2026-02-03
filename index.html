@@ -1,56 +1,67 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>My WhatsApp Clone</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #dadbd3; display: flex; flex-direction: column; height: 100vh; }
+        /* Header */
+        .header { background-color: #075e54; color: white; padding: 10px 16px; display: flex; align-items: center; font-size: 18px; font-weight: bold; }
+        /* Chat Area */
+        #chat-box { flex: 1; overflow-y: auto; padding: 20px; background-image: url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png'); background-repeat: repeat; }
+        /* Bubbles */
+        .message { max-width: 60%; margin-bottom: 12px; padding: 8px 12px; border-radius: 8px; font-size: 14px; position: relative; clear: both; box-shadow: 0 1px 0.5px rgba(0,0,0,0.13); }
+        .received { background-color: white; float: left; border-top-left-radius: 0; }
+        .sent { background-color: #dcf8c6; float: right; border-top-right-radius: 0; }
+        .sender-name { font-weight: bold; font-size: 12px; color: #075e54; display: block; margin-bottom: 2px; }
+        /* Input Area */
+        .input-area { background-color: #f0f0f0; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .row { display: flex; gap: 8px; }
+        input { padding: 10px; border: none; border-radius: 20px; outline: none; }
+        #userName { width: 120px; }
+        #msgInput { flex: 1; }
+        button { background-color: #25d366; color: white; border: none; padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
+    </style>
 </head>
-<body style="font-family: Arial; background: #e5ddd5; padding: 20px; display: flex; flex-direction: column; align-items: center;">
+<body>
 
-    <div style="width: 100%; max-width: 400px; background: #075e54; color: white; padding: 10px; border-radius: 10px 10px 0 0; text-align: center;">
-        <strong>WhatsApp Clone</strong>
-    </div>
+    <div class="header">WhatsApp Clone</div>
 
-    <div id="chat-box" style="width: 100%; max-width: 400px; height: 400px; background: white; padding: 15px; overflow-y: scroll; border: 1px solid #ccc;">
-        </div>
+    <div id="chat-box"></div>
 
-    <div style="width: 100%; max-width: 400px; background: #f0f0f0; padding: 10px; border-radius: 0 0 10px 10px; display: flex; flex-direction: column; gap: 5px;">
-        <input type="text" id="userName" placeholder="Your Name (e.g. Rahul)" style="padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
-        <div style="display: flex; gap: 5px;">
-            <input type="text" id="msgInput" placeholder="Type a message..." style="flex: 1; padding: 8px; border-radius: 5px; border: 1px solid #ccc;">
-            <button onclick="send()" style="padding: 8px 15px; background: #25d366; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Send</button>
+    <div class="input-area">
+        <div class="row">
+            <input type="text" id="userName" placeholder="Your Name">
+            <input type="text" id="msgInput" placeholder="Type a message">
+            <button onclick="send()">Send</button>
         </div>
     </div>
 
     <script>
-        // Your unique database connection
         const URL = 'https://dgrdilmeeeejsjxwyzcf.supabase.co';
         const KEY = 'sb_publishable_yvI1lQEmFmcOAc8QuEQlLA_TpM306Zv';
         const _supabase = supabase.createClient(URL, KEY);
 
-        // Listen for new messages from anyone
         _supabase.channel('messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
             const chat = document.getElementById('chat-box');
-            const isMe = payload.new.sender === document.getElementById('userName').value;
+            const myName = document.getElementById('userName').value;
+            const isMe = payload.new.sender === myName;
             
             chat.innerHTML += `
-                <div style="margin-bottom: 10px; text-align: ${isMe ? 'right' : 'left'}">
-                    <div style="display: inline-block; padding: 8px 12px; border-radius: 10px; background: ${isMe ? '#dcf8c6' : '#fff'}; border: 1px solid #ddd;">
-                        <small style="color: #075e54; font-weight: bold;">${payload.new.sender}</small><br>
-                        ${payload.new.content}
-                    </div>
+                <div class="message ${isMe ? 'sent' : 'received'}">
+                    <span class="sender-name">${payload.new.sender}</span>
+                    ${payload.new.content}
                 </div>`;
             chat.scrollTop = chat.scrollHeight;
         }).subscribe();
 
-        // Function to send a message
         async function send() {
             const name = document.getElementById('userName').value || 'Guest';
             const input = document.getElementById('msgInput');
-            if (input.value === "") return;
-
-            await _supabase.from('messages').insert([
-                { content: input.value, sender: name }
-            ]);
+            if (!input.value) return;
+            await _supabase.from('messages').insert([{ content: input.value, sender: name }]);
             input.value = '';
         }
     </script>
