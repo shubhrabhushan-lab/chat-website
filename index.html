@@ -27,7 +27,8 @@
     <script>
         const URL = 'https://dgrdilmeeeejsjxwyzcf.supabase.co';
         const KEY = 'sb_publishable_yvI1lQEmFmcOAc8QuEQlLA_TpM306Zv';
-        const _supabase = supabase.createClient(URL, KEY);
+       const _supabase = supabaseJs.createClient(URL, KEY);
+
 
         async function fetchMessages() {
             const { data, error } = await _supabase.from('messages').select('*');
